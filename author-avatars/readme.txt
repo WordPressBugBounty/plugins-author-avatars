@@ -3,8 +3,8 @@ Contributors: pbearne, bforchhammer
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=MZTZ5S8MGF75C&lc=CA&item_name=Wordpress%20Development%20%2f%20Paul%20Bearne&item_number=AuthorAvatarsList%20Plugin&currency_code=CAD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Tags: block, Avatar, Author, Image, Profile
 Requires at least: 3.0
-Tested up to: 6.4.2
-Stable tag: 2.1.22
+Tested up to: 6.6.2
+Stable tag: 2.1.24
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,10 @@ If you have added CSS to your theme you may have to update it for this upgrade (
 7. Advance Gutenberg blocks options
 
 == Changelog ==
+2.1.24
+Addjusted where the late escaping happened for the background-color
+Fix issue with the border in the block
+Added radius control for avatar in the block
 
 2.1.23
 Addjusted where the late escaping happened for the avatar name
