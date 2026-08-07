@@ -2,7 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "author-avatars/show-avatar",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Author Avatar List Block",
   "category": "widgets",
   "keywords": [
@@ -27,8 +27,8 @@
       "default": 0
     },
     "size": {
-      "type": "number",
-      "default": 50
+      "type": "string",
+      "default": "50px"
     },
     "email": {
       "type": "string"
@@ -125,6 +125,12 @@
       "type": "object"
     },
     "avatar_margin": {
+      "type": "object"
+    },
+    "avatar_border": {
+      "type": "object"
+    },
+    "avatar_border_radius": {
       "type": "object"
     },
     "card_border": {

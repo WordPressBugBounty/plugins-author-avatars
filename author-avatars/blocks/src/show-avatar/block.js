@@ -24,6 +24,16 @@ import {
 	ColorPicker,
 	CheckboxControl,
 	TextareaControl,
+	__experimentalUnitControl,
+	__experimentalBoxControl,
+	__experimentalBorderControl,
+	__experimentalBorderRadiusControl,
+	__experimentalBorderBoxControl,
+	UnitControl as _UnitControl,
+	BoxControl as _BoxControl,
+	BorderControl as _BorderControl,
+	BorderRadiusControl as _BorderRadiusControl,
+	BorderBoxControl as _BorderBoxControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -39,10 +49,11 @@ import _ServerSideRender from '@wordpress/server-side-render';
 
 const PanelColorSettingsEditor = PanelColorSettings || wp.editor?.PanelColorSettings || (() => null);
 const ServerSideRender = _ServerSideRender || wp.components?.ServerSideRender || (() => null);
-const UnitControl = wp.components?.__experimentalUnitControl || wp.components?.UnitControl || (() => null);
-const BoxControl = wp.components?.__experimentalBoxControl || wp.components?.BoxControl || (() => null);
-const BorderControl = wp.components?.__experimentalBorderControl || wp.components?.BorderControl || (() => null);
-const BorderRadiusControl = wp.components?.__experimentalBorderRadiusControl || wp.components?.BorderRadiusControl || (() => null);
+const UnitControl = _UnitControl || __experimentalUnitControl || wp.components?.__experimentalUnitControl || wp.components?.UnitControl || (() => null);
+const BoxControl = _BoxControl || __experimentalBoxControl || wp.components?.__experimentalBoxControl || wp.components?.BoxControl || (() => null);
+const BorderControl = _BorderControl || __experimentalBorderControl || wp.components?.__experimentalBorderControl || wp.components?.BorderControl || (() => null);
+const BorderBoxControl = _BorderBoxControl || __experimentalBorderBoxControl || wp.components?.__experimentalBorderBoxControl || wp.components?.BorderBoxControl || (() => null);
+const BorderRadiusControl = _BorderRadiusControl || __experimentalBorderRadiusControl || wp.components?.__experimentalBorderRadiusControl || wp.components?.BorderRadiusControl || wp.blockEditor?.__experimentalBorderRadiusControl || wp.blockEditor?.BorderRadiusControl || (() => null);
 
 const MultiCheckboxControl = ( { label, options, selected, onChange } ) => (
 	<Fragment>
@@ -159,112 +170,141 @@ const Edit = ( props ) => {
 		<Fragment>
 			<InspectorControls key="inspector">
 				<div className="author-avatar-components-panel">
-					{ loading && <Spinner /> }
-					<SelectControl
-						label={ __( 'User or Email addrerss/user_id or Roles', 'author-avatar' ) }
-						name="user_id"
-						value={ user_id }
-						options={ user_options }
-						onChange={ ( val ) => setAttributes( { user_id: val } ) }
-					/>
-					{ -1 == user_id && (
-						<TextControl
-							label="Custom email / id"
-							type="text"
-							value={ email }
-							onChange={ ( val ) => setAttributes( { email: val } ) }
-						/>
+					{ loading && (
+						<div style={ { padding: '16px' } }>
+							<Spinner />
+						</div>
 					) }
-					{ 0 == user_id && (
+					<PanelBody title={ __( 'User Selection', 'author-avatars' ) } initialOpen={ true }>
+						<SelectControl
+							label={ __( 'User or Email addrerss/user_id or Roles', 'author-avatar' ) }
+							name="user_id"
+							value={ user_id }
+							options={ user_options }
+							onChange={ ( val ) => setAttributes( { user_id: val } ) }
+						/>
+						{ -1 == user_id && (
+							<TextControl
+								label="Custom email / id"
+								type="text"
+								value={ email }
+								onChange={ ( val ) => setAttributes( { email: val } ) }
+							/>
+						) }
+						{ 0 == user_id && (
+							<MultiCheckboxControl
+								label={ __( 'Which Roles to display:', 'author-avatar' ) }
+								options={ user_roles }
+								selected={ role }
+								onChange={ ( val ) => setAttributes( { role: val } ) }
+							/>
+						) }
 						<MultiCheckboxControl
-							label={ __( 'Which Roles to display:', 'author-avatar' ) }
-							options={ user_roles }
-							selected={ role }
-							onChange={ ( val ) => setAttributes( { role: val } ) }
+							label={ __( 'Info to show with avatar:', 'author-avatar' ) }
+							options={ display_options }
+							selected={ display }
+							onChange={ ( val ) => setAttributes( { display: val } ) }
 						/>
-					) }
-					<MultiCheckboxControl
-						label={ __( 'Info to show with avatar:', 'author-avatar' ) }
-						options={ display_options }
-						selected={ display }
-						onChange={ ( val ) => setAttributes( { display: val } ) }
-					/>
 
-					<SelectControl
-						label={ __( 'Sort by', 'author-avatar' ) }
-						value={ sort_avatars_by }
-						options={ sort_list }
-						onChange={ ( val ) => setAttributes( { sort_avatars_by: val } ) }
-					/>
+						<SelectControl
+							label={ __( 'Sort by', 'author-avatar' ) }
+							value={ sort_avatars_by }
+							options={ sort_list }
+							onChange={ ( val ) => setAttributes( { sort_avatars_by: val } ) }
+						/>
 
-					<SelectControl
-						label={ __( 'Sort order', 'author-avatar' ) }
-						value={ sort_order }
-						options={ [
-							{ label: 'Ascending', value: 'asc' },
-							{ label: 'Descending', value: 'desc' },
-						] }
-						onChange={ ( val ) => setAttributes( { sort_order: val } ) }
-					/>
+						<SelectControl
+							label={ __( 'Sort order', 'author-avatar' ) }
+							value={ sort_order }
+							options={ [
+								{ label: 'Ascending', value: 'asc' },
+								{ label: 'Descending', value: 'desc' },
+							] }
+							onChange={ ( val ) => setAttributes( { sort_order: val } ) }
+						/>
 
-					<PanelBody title={ __( 'Avatar Card Styles', 'author-avatars' ) } initialOpen={ true }>
 						<SelectControl
 							label={ __( 'Link avatars to', 'author-avatar' ) }
 							value={ link }
 							options={ user_links }
 							onChange={ ( val ) => setAttributes( { link: val } ) }
 						/>
-						<PanelColorSettingsEditor
-							title={ __( 'Card Colors', 'author-avatars' ) }
-							initialOpen={ false }
-							colorSettings={ [
-								{
-									value: background_color,
-									onChange: ( val ) => setAttributes( { background_color: val } ),
-									label: __( 'Background Color', 'author-avatars' ),
-								},
-								{
-									value: font_color,
-									onChange: ( val ) => setAttributes( { font_color: val } ),
-									label: __( 'Font Color', 'author-avatars' ),
-								},
-								{
-									value: link_color,
-									onChange: ( val ) => setAttributes( { link_color: val } ),
-									label: __( 'Link Color', 'author-avatars' ),
-								},
-								{
-									value: link_hover_color,
-									onChange: ( val ) => setAttributes( { link_hover_color: val } ),
-									label: __( 'Link Hover Color', 'author-avatars' ),
-								},
-							] }
+						<UnitControl
+							label={ __( 'Avatar size', 'author-avatar' ) }
+							value={ size }
+							onChange={ ( val ) => setAttributes( { size: val } ) }
+							__next40pxDefaultSize={ true }
 						/>
+					</PanelBody>
+
+					<PanelColorSettingsEditor
+						title={ __( 'Card Colors', 'author-avatars' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: background_color,
+								onChange: ( val ) => setAttributes( { background_color: val } ),
+								label: __( 'Background Color', 'author-avatars' ),
+							},
+							{
+								value: font_color,
+								onChange: ( val ) => setAttributes( { font_color: val } ),
+								label: __( 'Font Color', 'author-avatars' ),
+							},
+							{
+								value: link_color,
+								onChange: ( val ) => setAttributes( { link_color: val } ),
+								label: __( 'Link Color', 'author-avatars' ),
+							},
+							{
+								value: link_hover_color,
+								onChange: ( val ) => setAttributes( { link_hover_color: val } ),
+								label: __( 'Link Hover Color', 'author-avatars' ),
+							},
+						] }
+					/>
+
+					<PanelBody title={ __( 'Avatar Card Styles', 'author-avatars' ) } initialOpen={ true }>
+							<div className="author-avatars-border-control-wrapper">
+								<BorderBoxControl
+								__next40pxDefaultSize={ true }
+								label={ __( 'Avatar Border', 'author-avatars' ) }
+								value={ attributes.avatar_border }
+								onChange={ ( value ) => setAttributes( { avatar_border: value } ) }
+							/>
+							<BorderRadiusControl
+								__next40pxDefaultSize={ true }
+								label={ __( 'Avatar Border Radius', 'author-avatars' ) }
+								values={ attributes.avatar_border_radius }
+								onChange={ ( value ) => setAttributes( { avatar_border_radius: value } ) }
+							/>
+						</div>
 						<div className="author-avatars-border-control-wrapper">
-							<BorderControl
-								label={ __( 'Border', 'author-avatars' ) }
+							<BorderBoxControl
+								__next40pxDefaultSize={ true }
+								label={ __( 'Card Border', 'author-avatars' ) }
 								value={ attributes.card_border }
 								onChange={ ( value ) => setAttributes( { card_border: value } ) }
 							/>
+							<BorderRadiusControl
+								__next40pxDefaultSize={ true }
+								label={ __( 'Card Border Radius', 'author-avatars' ) }
+								values={ attributes.card_border_radius }
+								onChange={ ( value ) => setAttributes( { card_border_radius: value } ) }
+							/>
 						</div>
-						<BorderRadiusControl
-							label={ __( 'Border Radius', 'author-avatars' ) }
-							values={ attributes.card_border_radius }
-							onChange={ ( value ) => setAttributes( { card_border_radius: value } ) }
-						/>
 						<BoxControl
 							__next40pxDefaultSize={ true }
-							label={ __( 'Padding', 'author-avatars' ) }
+							label={ __( 'Card Padding', 'author-avatars' ) }
 							values={ attributes.avatar_padding }
 							onChange={ ( value ) => setAttributes( { avatar_padding: value } ) }
 						/>
 						<BoxControl
 							__next40pxDefaultSize={ true }
-							label={ __( 'Margin', 'author-avatars' ) }
+							label={ __( 'Card Margin', 'author-avatars' ) }
 							values={ attributes.avatar_margin }
 							onChange={ ( value ) => setAttributes( { avatar_margin: value } ) }
 						/>
-
 						<PanelRow className="author-avatars-inline-unit-controls">
 							<UnitControl
 								__next40pxDefaultSize={ true }
@@ -295,13 +335,15 @@ const Edit = ( props ) => {
 						</PanelRow>
 					</PanelBody>
 
-					<Fragment>
-						<div dangerouslySetInnerHTML={ { __html: DonateButton } } />
-					</Fragment>
-					<div>
-						<label className="blocks-base-control__label">
-							{ __( 'More options in Adavanced:', 'author-avatar' ) }
-						</label>
+					<div style={ { padding: '16px' } }>
+						<Fragment>
+							<div dangerouslySetInnerHTML={ { __html: DonateButton } } />
+						</Fragment>
+						<div>
+							<label className="blocks-base-control__label">
+								{ __( 'More options in Adavanced:', 'author-avatar' ) }
+							</label>
+						</div>
 					</div>
 				</div>
 			</InspectorControls>
